@@ -11,7 +11,7 @@ inputs:
     default: 'simple'
   engine:
     required: false
-    description: 'Provide comma-separated values of Code Analyzer engine(s) to excecute. Defaults to Code Analyzer's defaults based on runtype.'
+    description: 'Provide comma-separated values of Code Analyzer engine(s) to excecute. Defaults to Code Analyzer defaults based on runtype.'
   projectdir:
     required: false
     description: 'Path to project repository. Necessary when invoking sfge engine. Defaults to current directory.'

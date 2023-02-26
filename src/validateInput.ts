@@ -14,7 +14,7 @@ const ENV_COMMAND = 'COMMAND';
 const ENV_ENGINE = 'ENGINE';
 const ENV_PROJDIR = 'PROJDIR';
 
-function validate(): void {
+function validateInput(): void {
 
     // Capture runtype and perform other validations based on this
     const runtypeInput = core.getInput(INPUT_RUNTYPE);
@@ -62,4 +62,4 @@ function addProjectDir() {
     core.exportVariable(ENV_PROJDIR, `--projectdir ${projectdirInput}`);
 }
 
-validate()
+validateInput()

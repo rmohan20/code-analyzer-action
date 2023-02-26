@@ -20,9 +20,11 @@ function validateInput(): void {
     const runtypeInput = core.getInput(INPUT_RUNTYPE);
 
     if (runtypeInput.toLowerCase() === RUNTYPE_SIMPLE) {
+        core.debug('COMMAND = scanner:run');
         core.exportVariable(ENV_COMMAND, 'scanner:run');
         validateSimpleRun();
     } else if (runtypeInput.toLowerCase() === RUNTYPE_DFA) {
+        core.debug('COMMAND = scanner:run:dfa');
         core.exportVariable(ENV_COMMAND, 'scanner:run:dfa');
         validateDfaRun();
     } else if (runtypeInput.toLowerCase() === RUNTYPE_ALL) {
@@ -33,16 +35,20 @@ function validateInput(): void {
     if (resultascommentsInput) {
         core.setFailed('resultascomments is not supported yet');
     }
+
+    
 }
 
 function validateSimpleRun(): void {
     const engineInput = core.getInput(INPUT_ENGINE);
 
+    core.debug(`ENGINE = ${engineInput}`);
     if (!engineInput) {
         // We don't need --engine if there's no non-default engine requested.
         core.exportVariable(ENV_ENGINE, '');
     } else {
         if (engineInput.indexOf('sfge') > -1) {
+            core.debug('Found sfge as a requested engine.');
             addProjectDir();
         }
         // Add --engine param
@@ -59,6 +65,7 @@ function validateDfaRun() {
 
 function addProjectDir() {
     const projectdirInput = core.getInput(INPUT_PROJDIR);
+    core.debug(`PROJECTDIR = ${projectdirInput}`);
     core.exportVariable(ENV_PROJDIR, `--projectdir ${projectdirInput}`);
 }
 

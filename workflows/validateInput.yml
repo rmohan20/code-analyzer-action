@@ -60,12 +60,3 @@ jobs:
             echo "ENGINE=--engine ${{ inputs.engine }}"
             echo "Adding engine clause: ${{ env.ENGINE }}"
           fi
-
-
-
-
-runs:
-  using: 'node16'
-  main: 'lib/validateInput.js'
-
-

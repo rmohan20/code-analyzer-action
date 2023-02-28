@@ -29,7 +29,7 @@ runs:
         runtype: ${{ inputs.runtype }}
         engine: ${{ inputs.engine }}
         projectdir: ${{ inputs.projectdir }}
-        resultascomments: ${{ input.resultascomments }}
+        resultascomments: ${{ inputs.resultascomments }}
 
 
 

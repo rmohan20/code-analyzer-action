@@ -1,0 +1,71 @@
+name: validate-input
+on:
+  workflow_call:
+    inputs:
+      runtype:
+        required: false
+        description: 'Type of run. Valid values are "simple", "dfa", "all". Defaults to "simple".'
+        type: string
+        default: 'simple'
+      engine:
+        required: false
+        description: 'Provide comma-separated values of Code Analyzer engine(s) to excecute. Defaults to Code Analyzer defaults based on runtype.'
+        type: string
+      projectdir:
+        required: false
+        description: 'Path to project repository. Necessary when invoking sfge engine. Defaults to current directory.'
+        type: string
+        default: './.'
+      resultascomments:
+        required: false
+        description: 'Boolean to indicate if violations should be posted as comments. Defaults to false.'
+        type: boolean
+        default: false
+
+jobs:
+  validate-runtype:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate runtype
+        shell: bash
+        id: validate-runtype
+        run: |
+          if [[ ${{ inputs.runtype == 'simple' }} ]]; then
+            echo "COMMAND=scanner:run" >> $GITHUB_ENV
+            echo "'simple' run selected: ${{ env.COMMAND }}"
+          elif [[ ${{ inputs.runtype == 'dfa' }} ]]; then
+            echo "COMMAND=scanner:run:dfa" >> $GITHUB_ENV
+            echo "PROJDIR=--projectdir ${{ inputs.projectdir }}" >> $GITHUB_ENV
+            echo "'dfa' run selected: ${{ env.COMMAND }}, ${{ env.PROJDIR }}"
+          else
+            echo "Unsupported runtype: ${{ inputs.runtype }}"
+            exit 1
+          fi
+  populate-engine-params:
+    runs-on: ubuntu-latest
+    depends-on: validate-runtype
+    steps:
+      - name: Populate engine parameter
+        shell: bash
+        id: populate-engine
+        run: |
+          if [[ ${{ inputs.engine != '' }} ]]; then
+            echo "No specific engine requested. Using defaults"
+          elif [[ ${{ inputs.engine}} == *"sfge"* ]]; then
+            echo "ENGINE=--engine ${{ inputs.engine }}"
+            echo "Adding engine clause for sfge: ${{ env.ENGINE }}"
+            echo "PROJDIR=--projectdir ${{ inputs.projectdir }}" >> $GITHUB_ENV
+            echo "Adding project dir: ${{ env.PROJDIR }}"
+          else
+            echo "ENGINE=--engine ${{ inputs.engine }}"
+            echo "Adding engine clause: ${{ env.ENGINE }}"
+          fi
+
+
+
+
+runs:
+  using: 'node16'
+  main: 'lib/validateInput.js'
+
+

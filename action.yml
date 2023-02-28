@@ -22,7 +22,14 @@ inputs:
     default: false
 
 runs:
-  using: 'node16'
-  main: 'lib/validateInput.js'
+  using: "composite"
+  steps:
+    - uses: ./workflows/validateInput.yml
+      with:
+        runtype: ${{ inputs.runtype }}
+        engine: ${{ inputs.engine }}
+        projectdir: ${{ inputs.projectdir }}
+        resultascomments: ${{ input.resultascomments }}
+
 
 

@@ -24,7 +24,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: action_modules/validate-input
+    - uses: rmohan20/code-analyzer-action/basic/action_modules/validate-input
       with:
         runtype: ${{ inputs.runtype }}
         engine: ${{ inputs.engine }}

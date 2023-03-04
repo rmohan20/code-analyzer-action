@@ -185,6 +185,7 @@ runs:
     - id: collect-results
       shell: bash
       run: |
+        RESULTS_CREATED=$(grep "Rule violations were written" command_output.txt)
         if [[ -e sfca_results.json ]]; then
           JSON_OUTPUT=$(cat sfca_results.json)
         elif [[ -z $RESULTS_CREATED ]]; then

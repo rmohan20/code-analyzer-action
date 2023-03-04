@@ -176,8 +176,7 @@ runs:
           ${{steps.populate-engine.outputs.Engine}} \
           ${{steps.populate-projdir.outputs.ProjDir}} \
           ${{steps.populate-sevthreshold.outputs.SevThreshold}} \
-          ${{steps.populate-outfile.outputs.Outfile}} \
-        > command_output.txt
+          ${{steps.populate-outfile.outputs.Outfile}} > command_output.txt
       shell: bash
       continue-on-error: true
 

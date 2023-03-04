@@ -187,7 +187,7 @@ runs:
         RESULTS_CREATED="$(grep 'Rule violations were written' command_output.txt)"
         if [[ -e sfca_results.json ]]; then
           JSON_OUTPUT=$(cat sfca_results.json)
-        elif [[ -z $RESULTS_CREATED ]]; then
+        elif [[ -z "$RESULTS_CREATED" ]]; then
           JSON_OUTPUT="Encountered an error during execution."
         else
           JSON_OUTPUT=""

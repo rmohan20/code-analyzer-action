@@ -176,7 +176,8 @@ runs:
           ${{steps.populate-engine.outputs.Engine}} \
           ${{steps.populate-projdir.outputs.ProjDir}} \
           ${{steps.populate-sevthreshold.outputs.SevThreshold}} \
-          ${{steps.populate-outfile.outputs.Outfile}}
+          ${{steps.populate-outfile.outputs.Outfile}} \
+        > command_output.txt
       shell: bash
       continue-on-error: true
 
@@ -184,8 +185,13 @@ runs:
     - id: collect-results
       shell: bash
       run: |
+        cat command_output.txt
+        RESULTS_CREATED=$(grep "Rule violations were written" command_output.txt)
+        
         if [[ -e sfca_results.json ]]; then
-          JSON_OUTPUT=`cat sfca_results.json`
+          JSON_OUTPUT=$(cat sfca_results.json)
+        elif [[ -z $RESULTS_CREATED ]]; then
+          JSON_OUTPUT="Encountered an error during execution."
         else
           JSON_OUTPUT=""
         fi

@@ -121,7 +121,13 @@ runs:
       with:
         script: |
           core.endgroup
-
+  ## Temporary
+    - id: invoke-custom-ts
+      uses: actions/github-script@v6
+      with:
+        script: |
+          dist/index.js
+          
   ## Temporary
     - id: invoke-script
       uses: actions/github-script@v6

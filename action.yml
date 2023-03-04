@@ -186,9 +186,9 @@ runs:
 #FIXME: This step should send an empty string if no results exist
     - if: success() || failure()
       uses: rmohan20/code-analyzer-pr-buddy@tsaction
-        with:
-          jsonstring: "$(cat sfca_results.json)"
-          runtype: ${{ inputs.runtype }}
+      with:
+        jsonstring: "$(cat sfca_results.json)"
+        runtype: ${{ inputs.runtype }}
 
     - if: ${{steps.code-analyzer.outcome}} == "failure"
       uses: actions/github-script@v6

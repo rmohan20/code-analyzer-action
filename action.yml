@@ -19,10 +19,6 @@ inputs:
     required: false
     description: 'Path to project repository. Necessary when invoking sfge engine. Defaults to current directory.'
     type: string
-  outfile:
-    required: false
-    description: 'Output file to collect the results in. Format depends on the extension of the filename. Defaults to sfca_results.json'
-    default: 'sfca_results.json'
 
 runs:
   using: 'composite'
@@ -184,12 +180,12 @@ runs:
       shell: bash
       continue-on-error: true
 
-#FIXME: This step sshould handle when no file was created because of an error
+#FIXME: This step should handle when no file was created because of an error
     - id: collect-results
       shell: bash
       run: |
         if [[ -e sfca_results.json ]]; then
-          JSON_OUTPUT="$(cat sfca_results.json)"
+          JSON_OUTPUT=`cat sfca_results.json`
         else
           JSON_OUTPUT=""
         fi

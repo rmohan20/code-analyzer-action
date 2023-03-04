@@ -182,14 +182,26 @@ runs:
           ${{steps.populate-sevthreshold.outputs.SevThreshold}} \
           ${{steps.populate-outfile.outputs.Outfile}}
       shell: bash
+      continue-on-error: true
 
-#FIXME: This step should send an empty string if no results exist
-    - if: success() || failure()
+#FIXME: This step sshould handle when no file was created because of an error
+    - id: collect-results
+      shell: bash
+      run: |
+        if [[ -e sfca_results.json ]]; then
+          JSON_OUTPUT="$(cat sfca_results.json)"
+        else
+          JSON_OUTPUT=""
+        fi
+        echo "JsonOutput=$JSON_OUTPUT" >> $GITHUB_OUTPUT
+
+    - name: Translate results into markdown
       uses: rmohan20/code-analyzer-pr-buddy@tsaction
       with:
-        jsonstring: "$(cat sfca_results.json)"
+        jsonstring: "${{ steps.collect-results.outputs.JsonOutput }}"
         runtype: ${{ inputs.runtype }}
 
+# FIXME: error message should be different if code analyzer ran into errors
     - if: ${{steps.code-analyzer.outcome}} == "failure"
       uses: actions/github-script@v6
       with:

@@ -22,7 +22,7 @@ inputs:
   outfile:
     required: false
     description: 'Output file to collect the results in. Format depends on the extension of the filename. Defaults to sfca_results.json'
-    default: 'sfca_results.html'
+    default: 'sfca_results.json'
 
 runs:
   using: 'composite'
@@ -121,19 +121,6 @@ runs:
       with:
         script: |
           core.endgroup
-  ## Temporary
-    - id: invoke-custom-ts
-      uses: actions/github-script@v6
-      with:
-        script: |
-          dist/index.js
-          
-  ## Temporary
-    - id: invoke-script
-      uses: actions/github-script@v6
-      with:
-        script: |
-          core.setFailed("Code Analyzer detected violations")
 
   #### Part 2 - Setup dependencies ####
 
@@ -176,7 +163,7 @@ runs:
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
           TARGET_LIST=$file,$TARGET_LIST
         done
-        TARGET=${TARGET_LIST::-1}
+        TARGET="--target ${TARGET_LIST::-1}"
         echo "Target=$TARGET" >> $GITHUB_OUTPUT
 
 
@@ -189,18 +176,19 @@ runs:
       id: code-analyzer
       run: |
         sfdx ${{steps.populate-command.outputs.Command}} \
-          --target "${{steps.populate-target.outputs.Target}}" \
+          ${{steps.populate-target.outputs.Target}} \
           ${{steps.populate-engine.outputs.Engine}} \
           ${{steps.populate-projdir.outputs.ProjDir}} \
           ${{steps.populate-sevthreshold.outputs.SevThreshold}} \
           ${{steps.populate-outfile.outputs.Outfile}}
       shell: bash
 
-    - if: failure()
-      uses: actions/upload-artifact@v3
-      with:
-        name: SFCA-Results
-        path: ${{inputs.outfile}}
+#FIXME: This step should send an empty string if no results exist
+    - if: success() || failure()
+      uses: rmohan20/code-analyzer-pr-buddy@tsaction
+        with:
+          jsonstring: "$(cat sfca_results.json)"
+          runtype: ${{ inputs.runtype }}
 
     - if: ${{steps.code-analyzer.outcome}} == "failure"
       uses: actions/github-script@v6

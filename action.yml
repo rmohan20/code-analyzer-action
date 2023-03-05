@@ -52,7 +52,7 @@ runs:
     - id: populate-outfile
       run: |
         echo "Populating outfile . . ."
-        OUTFILE="--outfile \"${{ inputs.outfile }}\""
+        OUTFILE="--outfile \"sfca_results.json\""
         echo "Outfile=$OUTFILE" >> $GITHUB_OUTPUT
       shell: bash
 
@@ -186,8 +186,6 @@ runs:
       run: |
         if [[ -e sfca_results.json ]]; then
           JSON_OUTPUT=$(cat sfca_results.json)
-        elif [[ -z "$RESULTS_CREATED" ]]; then
-          JSON_OUTPUT="Encountered an error during execution."
         else
           JSON_OUTPUT=""
         fi

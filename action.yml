@@ -198,8 +198,10 @@ runs:
         runtype: ${{ inputs.runtype }}
 
 # FIXME: error message should be different if code analyzer ran into errors
-    - if: ${{steps.code-analyzer.outcome}} == "failure"
-      uses: actions/github-script@v6
+    - uses: actions/github-script@v6
       with:
         script: |
-          core.setFailed("Code Analyzer detected violations")
+          if ("${{steps.code-analyzer.outcome}}" == "failure") {
+            core.setFailed("Code Analyzer detected violations")
+          }
+          

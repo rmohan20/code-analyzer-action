@@ -19,10 +19,6 @@ inputs:
     required: false
     description: 'Path to project repository. Necessary when invoking sfge engine. Defaults to current directory.'
     type: string
-  outfile:
-    required: false
-    description: 'Output file to collect the results in. Format depends on the extension of the filename. Defaults to sfca_results.json'
-    default: 'sfca_results.html'
 
 runs:
   using: 'composite'
@@ -56,7 +52,7 @@ runs:
     - id: populate-outfile
       run: |
         echo "Populating outfile . . ."
-        OUTFILE="--outfile \"${{ inputs.outfile }}\""
+        OUTFILE="--outfile \"sfca_results.json\""
         echo "Outfile=$OUTFILE" >> $GITHUB_OUTPUT
       shell: bash
 
@@ -163,7 +159,7 @@ runs:
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
           TARGET_LIST=$file,$TARGET_LIST
         done
-        TARGET=${TARGET_LIST::-1}
+        TARGET="--target ${TARGET_LIST::-1}"
         echo "Target=$TARGET" >> $GITHUB_OUTPUT
 
 
@@ -176,21 +172,36 @@ runs:
       id: code-analyzer
       run: |
         sfdx ${{steps.populate-command.outputs.Command}} \
-          --target "${{steps.populate-target.outputs.Target}}" \
+          ${{steps.populate-target.outputs.Target}} \
           ${{steps.populate-engine.outputs.Engine}} \
           ${{steps.populate-projdir.outputs.ProjDir}} \
           ${{steps.populate-sevthreshold.outputs.SevThreshold}} \
           ${{steps.populate-outfile.outputs.Outfile}}
       shell: bash
+      continue-on-error: true
 
-    - if: failure()
-      uses: actions/upload-artifact@v3
+#FIXME: This step should handle when no file was created because of an error
+    - id: collect-results
+      shell: bash
+      run: |
+        if [[ -e sfca_results.json ]]; then
+          JSON_OUTPUT=$(cat sfca_results.json)
+        else
+          JSON_OUTPUT=""
+        fi
+        echo "JsonOutput=$JSON_OUTPUT" >> $GITHUB_OUTPUT
+
+    - name: Translate results into markdown
+      uses: rmohan20/code-analyzer-pr-buddy@tsaction
       with:
-        name: SFCA-Results
-        path: ${{inputs.outfile}}
+        jsonstring: "${{ steps.collect-results.outputs.JsonOutput }}"
+        runtype: ${{ inputs.runtype }}
 
-    - if: ${{steps.code-analyzer.outcome}} == "failure"
-      uses: actions/github-script@v6
+# FIXME: error message should be different if code analyzer ran into errors
+    - uses: actions/github-script@v6
       with:
         script: |
-          core.setFailed("Code Analyzer detected violations")
+          if ("${{steps.code-analyzer.outcome}}" == "failure") {
+            core.setFailed("Code Analyzer detected violations")
+          }
+          
